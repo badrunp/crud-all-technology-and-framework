@@ -1,0 +1,22 @@
+{
+  "name": "javascript-crud",
+  "version": "1.0.0",
+  "description": "for learning javascript basic",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npx tailwindcss -i ./css/tailwind.css -o ./css/app.css --watch"
+  },
+  "keywords": [
+    "javscript",
+    "tailwindcss",
+    "crud"
+  ],
+  "author": "Muhammad Badrun",
+  "license": "ISC",
+  "devDependencies": {
+    "autoprefixer": "^10.4.2",
+    "postcss": "^8.4.5",
+    "tailwindcss": "^3.0.13"
+  }
+}
