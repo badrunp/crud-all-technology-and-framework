@@ -7,14 +7,14 @@
     inputCari.addEventListener('focus', function () {
         formCari.classList.remove('border-gray-300')
 
-        formCari.classList.add('border-blue-600')
+        formCari.classList.add('border-yellow-600')
         formCari.classList.add('ring-2')
     })
 
     inputCari.addEventListener('blur', function () {
         formCari.classList.add('border-gray-300')
 
-        formCari.classList.remove('border-blue-600')
+        formCari.classList.remove('border-yellow-600')
         formCari.classList.remove('ring-2')
     })
 
@@ -23,12 +23,13 @@
 
 
 class ProductDomain {
-    constructor(id, name, price, description, category) {
+    constructor(id, name, price, description, category, updatedAt) {
         this.id = id
         this.name = name
         this.price = price
         this.description = description
-        this.category = category
+        this.category = category,
+            this.updatedAt = updatedAt
     }
 }
 
@@ -48,19 +49,123 @@ class Helper {
     }
 }
 
+class DataInfoProduct {
+    static setPage(num) {
+        this.page = num
+    }
+
+    static setSorting(sorting) {
+        this.sorting = sorting
+    }
+
+    static getPage() {
+        return this.page ? this.page : 5
+    }
+
+    static getSorting() {
+        return this.sorting ? this.sorting : 'terbaru'
+    }
+
+    static setSearch(value) {
+        this.search = value
+    }
+
+    static getSearch() {
+        return this.search ? this.search : ''
+    }
+
+    static reset(type = 'all') {
+        this.paginate = 1
+
+        if (type != "page") {
+            this.sorting = 'terbaru'
+        }
+
+        if (type != 'search') {
+            this.search = ''
+            getElById('input-cari').value = ''
+        }
+    }
+
+    static setPaginate(value) {
+        this.paginate = value
+    }
+
+    static getPaginate() {
+        return this.paginate ? this.paginate : 1
+    }
+}
+
 class Product {
     static getProducts() {
         return JSON.parse(localStorage.getItem('products')) || []
     }
 
-    static loadProducts(data = []) {
-        const products = data.length > 0 ? data : this.getProducts();
+    static loadProducts(data = [], type = 'load') {
+
+        let products = data.length > 0 ? data : this.getProducts();
 
         if (!products.length < 1) {
 
             this.clearProductHtml()
+
+            products = this.productUpdateSorting(products)
+
+            const search = DataInfoProduct.getSearch();
+            if (search.length > 0) {
+                products = products.filter((item) => {
+                    if (item.name.toLowerCase().indexOf(search) != -1) {
+                        return item
+                    }
+                })
+            }
+
+            const page = DataInfoProduct.getPaginate()
+            const dataCount = products.length
+            const perPage = DataInfoProduct.getPage();
+            const countPaginate = Math.ceil(dataCount / parseInt(perPage))
+            const skip = (parseInt(page) - 1) * parseInt(perPage)
+            const limit = perPage + skip
+
+            const paginateHtml = getElById('data-pagination');
+            let renderHtml = '';
+
+            [...Array(countPaginate)].map((item, i) => {
+                if (i == 0 && page != 1) {
+                    renderHtml += `
+                        <button
+                        onclick="handleClickPaginate(${page - 1})"
+                        class="py-2 px-4 text-sm focus:outline-none font-semibold cursor-pointer hover:bg-gray-200 border-gray-300 border-r">
+                        prev</button>
+                    `
+                }
+                renderHtml += `
+                <button
+                    onclick="handleClickPaginate(${i + 1})"
+                    class="py-2 px-4 text-sm focus:outline-none font-semibold cursor-pointer ${page == i + 1 ? 'bg-yellow-500 text-white hover:bg-yellow-600 border-transparent' : 'hover:bg-gray-200 border-gray-300'} border-r">
+                    ${i + 1}</button>
+                `
+
+                if (i + 1 == countPaginate && page != countPaginate) {
+                    renderHtml += `
+                        <button
+                        onclick="handleClickPaginate(${page + 1})"
+                        class="py-2 px-4 text-sm focus:outline-none font-semibold cursor-pointer hover:bg-gray-200 border-gray-300">
+                        next</button>
+                    `
+                }
+            })
+            paginateHtml.innerHTML = renderHtml
+
+            products = products.slice(skip, limit)
+            getElById('info-data-page').textContent = limit
+
+            if (products.length < 1) {
+                return this.productNotFound("Produk " + search + " tidak ditemukan!")
+            }
+
             return products.map((item) => {
-                this.renderProduct(item)
+                this.renderProduct(item, type)
             })
 
         }
@@ -68,12 +173,44 @@ class Product {
         return this.productNotFound("Produk masih kosong!")
     }
 
+    static productUpdateSorting(products) {
+        const dataSorting = DataInfoProduct.getSorting()
+
+        if (dataSorting == 'terdahulu') {
+            getElById('info-data-sorting').textContent = "Terdahulu dibuat"
+            products = products.sort((a, b) => parseInt(a.id) - parseInt(b.id))
+            return products;
+        } else if (dataSorting == 'terbaru-diubah') {
+            getElById('info-data-sorting').textContent = "Terbaru diubah"
+            products = products.sort((a, b) => b.updatedAt - a.updatedAt)
+            return products;
+        } else if (dataSorting == 'terdahulu-diubah') {
+            getElById('info-data-sorting').textContent = "Terdahulu diubah"
+            products = products.sort((a, b) => a.updatedAt - b.updatedAt)
+            return products;
+        } else if (dataSorting == 'nama-a-z') {
+            getElById('info-data-sorting').textContent = "Nama a-zA-Z"
+            products = products.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase()) ? 1 : -1)
+            return products;
+        } else if (dataSorting == 'nama-z-a') {
+            getElById('info-data-sorting').textContent = "Nama z-aZ-A"
+            products = products.sort((a, b) => (a.name.toLowerCase() < b.name.toLowerCase()) ? 1 : -1)
+            return products;
+        } else {
+            getElById('info-data-sorting').textContent = "Terbaru dibuat"
+            products = products.sort((a, b) => parseInt(b.id) - parseInt(a.id))
+            return products;
+
+        }
+    }
+
     static renderProduct({
         id,
         name,
         price,
-        category
-    }) {
+        category,
+
+    }, type) {
         const listProducts = document.getElementById('list-products')
         const tr = document.createElement('tr')
 
@@ -111,7 +248,6 @@ class Product {
                 </div>
             </td>
         `
-
         listProducts.append(tr)
     }
 
@@ -134,7 +270,8 @@ class Product {
         name,
         price,
         description,
-        category
+        category,
+        updatedAt
     }) {
 
         const products = this.getProducts();
@@ -144,12 +281,14 @@ class Product {
             name,
             price,
             description,
-            category
+            category,
+            updatedAt
         })
 
         localStorage.setItem('products', JSON.stringify(products))
 
-        this.loadProducts()
+        // DataInfoProduct.reset('page')
+        this.loadProducts([], 'save')
 
     }
 
@@ -204,7 +343,7 @@ class Product {
 
         const product = products.find((item) => item.id == id);
 
-        if(product){
+        if (product) {
             return product
         }
 
@@ -234,21 +373,23 @@ class Product {
         name,
         price,
         description,
-        category
-    }){
+        category,
+        updatedAt
+    }) {
 
         const product = this.findByIdProduct(id)
-        if(product){
+        if (product) {
             const products = this.getProducts()
 
             const newProducts = products.map((item) => {
-                if(item.id == id){
+                if (item.id == id) {
                     return {
                         id,
                         name,
                         price,
                         description,
-                        category
+                        category,
+                        updatedAt
                     }
                 }
 
@@ -257,17 +398,55 @@ class Product {
 
             localStorage.setItem('products', JSON.stringify(newProducts))
 
+            DataInfoProduct.reset()
             this.loadProducts()
             this.clearInput()
 
             Helper.flashMessage('Mengubah produk berhasil')
-        }else{
+        } else {
             window.location.href = '/'
         }
 
     }
 
 }
+
+
+document.querySelectorAll('.button-page').forEach((item) => {
+    item.addEventListener('click', function (e) {
+        e.preventDefault()
+
+        const page = parseInt(this.getAttribute('data-page'))
+
+        DataInfoProduct.setPage(page)
+        Product.loadProducts()
+
+        addClassNameByClass('dropdown-menu-page', 'hidden')
+    })
+})
+
+document.querySelectorAll('.button-sorting').forEach((item) => {
+    item.addEventListener('click', function (e) {
+        e.preventDefault()
+
+        const sorting = this.getAttribute('data-sorting')
+
+        DataInfoProduct.setSorting(sorting)
+        DataInfoProduct.reset('page')
+        Product.loadProducts()
+
+        addClassNameByClass('dropdown-menu-sorting', 'hidden')
+    })
+})
+
+getElById('input-cari').addEventListener('keyup', function (e) {
+
+    const value = e.target.value
+    DataInfoProduct.setSearch(value)
+    DataInfoProduct.reset('search')
+    Product.loadProducts()
+
+})
 
 getElById('form-input').addEventListener('click', function (e) {
     e.preventDefault();
@@ -281,7 +460,7 @@ getElById('form-input').addEventListener('click', function (e) {
         const description = form[2].value.trim()
         const category = form[3].value.trim()
         const productId = getElById('id').value.trim()
-        
+
         const isValid = Product.validate([
             {
                 label: 'name',
@@ -310,10 +489,10 @@ getElById('form-input').addEventListener('click', function (e) {
         ])
 
         if (Object.keys(isValid).length < 1) {
-            const product = new ProductDomain(productId ? parseInt(productId) : id, name, price, description, category)
-            if(productId != ""){
+            const product = new ProductDomain(productId ? parseInt(productId) : id, name, price, description, category, id)
+            if (productId != "") {
                 Product.updateProduct(product)
-            }else{
+            } else {
                 Product.saveProduct(product)
             }
 
@@ -339,7 +518,7 @@ getElById('button-modal-delete-product').addEventListener('click', function (e) 
     })
 })
 
-getElById('button-modal-cancel').addEventListener('click', function(){
+getElById('button-modal-cancel').addEventListener('click', function () {
     removeModal()
 })
 
@@ -354,10 +533,10 @@ function handleOpenModalDelete(id) {
     checkDropdownMenuAction()
 }
 
-function handleOpenModalEdit(id){
+function handleOpenModalEdit(id) {
 
     const product = Product.findByIdProduct(parseInt(id))
-    if(product){
+    if (product) {
         editFormTitle('edit', 'Ubah Produk')
 
         getElById('id').value = product.id
@@ -371,7 +550,7 @@ function handleOpenModalEdit(id){
 
 }
 
-function handleModalDetail(id){
+function handleModalDetail(id) {
 
     removeClassNameById('modal-edit', 'hidden')
     removeClassNameById('overlay', 'hidden')
@@ -391,11 +570,16 @@ function handleModalDetail(id){
 
 }
 
+function handleClickPaginate(num) {
+    DataInfoProduct.setPaginate(num)
+    Product.loadProducts()
+}
+
 getElById('overlay').addEventListener('click', function () {
     removeModal()
 })
 
-getElById('cancel-edit-button').addEventListener('click', function(){
+getElById('cancel-edit-button').addEventListener('click', function () {
     Product.clearInput()
 })
 
@@ -524,10 +708,10 @@ function firtUppercaseLetter(text) {
     return text.charAt(0).toUpperCase() + text.slice(1)
 }
 
-function editFormTitle(type = '', title = ''){
-    if(type == 'edit'){
+function editFormTitle(type = '', title = '') {
+    if (type == 'edit') {
         removeClassNameById('cancel-edit-button', 'hidden')
-    }else{
+    } else {
         addClassNameById('cancel-edit-button', 'hidden')
     }
 
