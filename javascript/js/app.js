@@ -28,8 +28,8 @@ class ProductDomain {
         this.name = name
         this.price = price
         this.description = description
-        this.category = category,
-            this.updatedAt = updatedAt
+        this.category = category
+        this.updatedAt = updatedAt
     }
 }
 
@@ -46,6 +46,23 @@ class Helper {
             addClassNameById('alert-success', '-translate-y-20')
             removeClassNameById('alert-success', 'translate-y-3')
         }, 3000)
+    }
+
+    static formatRupiah(angka, prefix = 'Rp. ') {
+        var number_string = angka.replace(/[^,\d]/g, '').toString(),
+            split = number_string.split(','),
+            sisa = split[0].length % 3,
+            rupiah = split[0].substr(0, sisa),
+            ribuan = split[0].substr(sisa).match(/\d{3}/gi),
+            separator = ''
+
+        if (ribuan) {
+            separator = sisa ? '.' : '';
+            rupiah += separator + ribuan.join('.');
+        }
+
+        rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+        return prefix == undefined ? rupiah : (rupiah ? 'Rp. ' + rupiah : '');
     }
 }
 
@@ -218,7 +235,7 @@ class Product {
         tr.innerHTML = `
             <td class="py-2 px-4 text-sm tracking-normal">${id}</td>
             <td class="py-2 px-4 text-sm tracking-normal">${name}</td>
-            <td class="py-2 px-4 text-sm tracking-normal">Rp. ${price}</td>
+            <td class="py-2 px-4 text-sm tracking-normal">${Helper.formatRupiah(price)}</td>
             <td class="py-2 px-4 text-sm tracking-normal">${category}</td>
             <td class="py-2 px-4 text-sm tracking-normal text-center relative">
                 <button class="mx-auto p-2 rounded-full hover:bg-gray-200 focus:outline-none" onclick="handleShowAction(${id})">
@@ -296,11 +313,11 @@ class Product {
 
         let array = []
 
-        data.map(({ label, value, fieldName, required }) => {
+        data.map(({ label, value, fieldName, required, number }) => {
             if (required) {
                 if (value == '' || value.length < 1) {
                     removeClassNameById(label, "border-gray-300")
-                    addClassNameById(label, "ring-red-300")
+                    addClassNameById(label, "focus:ring-red-300")
                     addClassNameById(label, "focus:border-red-500")
                     addClassNameById(label, "border-red-500")
 
@@ -309,16 +326,27 @@ class Product {
 
                     array.push(label)
                 } else {
+                    if (number && !/^[0-9]+$/.test(value)) {
+                        removeClassNameById(label, "border-gray-300")
+                        addClassNameById(label, "focus:ring-red-300")
+                        addClassNameById(label, "focus:border-red-500")
+                        addClassNameById(label, "border-red-500")
 
-                    addClassNameById(label, "border-gray-300")
-                    removeClassNameById(label, "ring-red-300")
-                    removeClassNameById(label, "focus:border-red-500")
-                    removeClassNameById(label, "border-red-500")
+                        document.getElementById(`${label}-invalid`).textContent = `${firtUppercaseLetter(fieldName)} harus berupa angka!`
+                        removeClassNameById(`${label}-invalid`, 'hidden')
 
-                    addClassNameById(`${label}-invalid`, 'hidden')
+                        array.push(label)
+                    } else {
+                        addClassNameById(label, "border-gray-300")
+                        removeClassNameById(label, "focus:ring-red-300")
+                        removeClassNameById(label, "focus:border-red-500")
+                        removeClassNameById(label, "border-red-500")
 
-                    const newArray = array.filter((item) => item != label)
-                    array = newArray
+                        addClassNameById(`${label}-invalid`, 'hidden')
+
+                        const newArray = array.filter((item) => item != label)
+                        array = newArray
+                    }
 
                 }
             }
@@ -411,7 +439,6 @@ class Product {
 
 }
 
-
 document.querySelectorAll('.button-page').forEach((item) => {
     item.addEventListener('click', function (e) {
         e.preventDefault()
@@ -472,7 +499,8 @@ getElById('form-input').addEventListener('click', function (e) {
                 label: 'price',
                 value: price,
                 fieldName: 'harga',
-                required: true
+                required: true,
+                number: true
             },
             {
                 label: 'description',
