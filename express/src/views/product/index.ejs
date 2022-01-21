@@ -1,0 +1,114 @@
+<%- include('../layouts/header') %>
+
+<%- include('../layouts/navbar') %>
+
+<div class="container mx-auto">
+    <div class="container mt-0 md:w-9/12 lg:w-8/12 mx-auto md:my-12">
+        <div class="bg-white shadow py-6 px-5 rounded">
+            <div class="block md:flex items-end justify-between">
+                <div class="bg-indigo-500 w-max bg-opacity-10 py-3 pl-3 pr-8 border-l-4 border-indigo-600 flex space-x-3 mb-4 md:mb-0">
+                    <span class="text-lg lg:text-2xl font-medium text-gray-700">Table Products</span>
+                </div>
+                <div class="flex justify-between space-x-2">
+                    <div class="relative flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600 absolute ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                          </svg>
+                  <input type="text" name="search" id="search" class="py-2 pr-2 pl-8 border border-gray-300 rounded focus:outline-none focus:border-transparent focus:ring-2 text-gray-600 focus:ring-indigo-600 transition ease-out duration-150" placeholder="Search..." />
+        </div>
+                    <a href="/create" class="py-2 px-4 bg-gradient-to-br shadow from-indigo-500 to-indigo-700 block rounded hover:from-indigo-600 hover:to-indigo-800 transition ease-out duration-150">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 lg:h-6 lg:w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                          </svg>
+                    </a>
+
+                </div>
+            </div>
+            <div class="mt-6 overflow-auto">
+                <% if(message){ %>
+                    <div class="py-3 rounded font-medium mb-5 bg-green-500 text-white text-sm text-center">
+                        <%- message %>
+                    </div>
+                <% } %>
+                <div id="loadingDiv" style="display: none;" class="text-sm font-medium text-gray-600 mb-1">Loading....</div>
+                <table class="devide divide-indigo-600 divide-y-2 w-full border border-gray-200">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="py-3 px-5 text-sm tracking-wide leading-6 text-gray-600">Name</th>
+                            <th class="py-3 px-5 text-sm tracking-wide leading-6 text-gray-600">Price</th>
+                            <th class="py-3 px-5 text-sm tracking-wide leading-6 text-gray-600">Quantity</th>
+                            <th class="py-3 px-5 text-sm tracking-wide leading-6 text-gray-600">Category</th>
+                            <th class="py-3 px-5 text-sm tracking-wide leading-6 text-gray-600">Description</th>
+                            <th class="py-3 px-5 text-sm tracking-wide leading-6 text-gray-600">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="product-list">
+                        <% if(products.length > 0) { %>
+                            <% products.map(item => { %>
+                                <tr class="text-center bg-white">
+                                    <td class="py-3 px-5 text-xs tracking-wide leading-6 text-gray-400 font-normal"><%= item.name %></td>
+                                    <td class="py-3 px-5 text-xs tracking-wide leading-6 text-gray-400 font-normal"><%= item.price %></td>
+                                    <td class="py-3 px-5 text-xs tracking-wide leading-6 text-gray-400 font-normal"><%= item.quantity %></td>
+                                    <td class="py-3 px-5 text-xs tracking-wide leading-6 text-gray-400 font-normal"><%= item.category %></td>
+                                    <td class="py-3 px-5 text-xs tracking-wide leading-6 text-gray-400 font-normal"><%= item.description %></td>
+                                    <td class="py-3 px-5 text-xs tracking-wide leading-6 text-gray-400 font-normal flex space-x-2">
+                                        <form action="/<%= item._id %>?_method=DELETE" method="POST">
+                                            <button onclick="return confirm('Are you sure?')" class="bg-red-500 text-white p-2 rounded">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                                  </svg>
+                                                </button>
+                                        </form>
+                                        <a href="/<%= item._id %>" class="bg-green-500 text-white p-2 rounded">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
+                                                <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" />
+                                              </svg>
+                                        </a>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        <% }else{ %>
+                            <tr>
+                                <td colspan="6" class="py-3 px-5 text-center text-sm font-medium text-gray-600">No Products!</td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+                
+                <% if(products.length > 0) { %>
+                    <div class="flex items-center space-x-2 mt-4 mb-4" id="navigation-product">
+                        <% if(page-1 !== 0){ %>
+                            <a href="?page=<%= page-1 %>" class="py-2 px-3 border boredr-gray-300 rounded text-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                  </svg>
+                            </a>
+                        <% } %>
+                        <% let prev = page-1; %>
+                        <% let next = page+1; %>
+
+                        <% for(var i = 0; i < limit; i++) { %>
+                            <% if(i+1 >= prev && i+1 <= next ) { %>
+                                <% if(i === page-1) { %>
+                                    <a href="?page=<%= i+1 %>" class="py-2 px-3 border boredr-transparent bg-indigo-600 text-white rounded text-sm"><%= i+1 %></a>
+                                    <% }else{ %>
+                                    <a href="?page=<%= i+1 %>" class="py-2 px-3 border boredr-gray-300 rounded text-sm"><%= i+1 %></a>
+                                    <% } %>
+                            <% } %>
+                        <% } %>
+                        <% if(page !== limit) { %>
+                            <a href="?page=<%= page+1 %>" class="py-2 px-3 border boredr-gray-300 rounded text-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                                  </svg>
+                            </a>
+                        <% } %>
+                    </div>
+                <% }  %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../layouts/footer') %>

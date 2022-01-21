@@ -1,0 +1,71 @@
+<%- include('../layouts/header') %>
+
+<%- include('../layouts/navbar') %>
+
+<div class="relative container mx-auto">
+    <div class="max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg mx-auto my-16 md:my-12">
+        <div class="bg-white shadow rounded py-6 px-5">
+            <div class="flex items-end justify-between">
+                <div class="bg-indigo-500 w-max bg-opacity-10 py-3 pl-3 pr-8 border-l-4 border-indigo-600">
+                    <span class="text-lg lg:text-2xl font-medium text-gray-700">Create Product</span>
+                </div>
+            </div>
+            <div class="py-9">
+                <form action="/store" method="POST">
+                    <% if(error.message){ %>
+                        <div class="py-3 rounded font-medium mb-5 bg-red-500 text-white text-sm text-center">
+                            <%- error.message %>
+                        </div>
+                    <% } %>
+                    <div class="relative mb-5">
+                        <input type="text" name="name" class="w-full border text-base border-gray-300 <%= message.name ? 'border-red-500' : '' %> rounded px-3 py-3 focus:outline-none text-gray-400 focus:ring-2 focus:ring-indigo-600 focus:border-transparent transition ease-out duration-150" placeholder="Product Name" value="<%- inputOldValues.name %>">
+                        <div class="mt-1 text-red-500 text-sm font-medium">
+                            <%- message.name %>
+                        </div>
+                    </div>
+                    <div class="relative mb-5">
+                        <input type="text" name="price" class="w-full border text-base border-gray-300 rounded px-3 py-3 focus:outline-none text-gray-400 focus:ring-2 focus:ring-indigo-600 focus:border-transparent transition ease-out duration-150 <%= message.price ? 'border-red-500' : '' %>" placeholder="Product Price" value="<%- inputOldValues.price %>">
+                        <div class="mt-1 text-red-500 text-sm font-medium">
+                            <%- message.price %>
+                        </div>
+                    </div>
+                    <div class="relative mb-5">
+                        <input type="text" name="quantity" class="w-full border text-base border-gray-300 rounded px-3 py-3 focus:outline-none text-gray-400 focus:ring-2 focus:ring-indigo-600 focus:border-transparent transition ease-out duration-150 <%= message.quantity ? 'border-red-500' : '' %>" placeholder="Product Quantity" value="<%- inputOldValues.quantity %>">
+                        <div class="mt-1 text-red-500 text-sm font-medium">
+                            <%- message.quantity %>
+                        </div>
+                    </div>
+                    <div class="relative mb-5">
+                        <select name="category" class="w-full border text-base border-gray-300 rounded px-3 py-3 focus:outline-none text-gray-400 focus:ring-2 focus:ring-indigo-600 focus:border-transparent transition ease-out duration-150 <%= message.category ? 'border-red-500' : '' %>">
+                            <option value="">Select Category</option>
+                            <% categories.map((item, index) => { %>
+                                <% if(inputOldValues.category === item.value) { %>
+                                <option value="<%= item.value %>" selected><%= item.name %></option>
+                                <% }else{%>
+                                <option value="<%= item.value %>"><%= item.name %></option>
+                                <% } %>
+                            <% }) %>
+                        </select>
+                        <div class="mt-1 text-red-500 text-sm font-medium">
+                            <%- message.category %>
+                        </div>
+                    </div>
+                    <div class="relative mb-5">
+                        <textarea name="description" class="w-full border text-base border-gray-300 rounded px-3 py-3 focus:outline-none text-gray-400 focus:ring-2 focus:ring-indigo-600 focus:border-transparent transition ease-out duration-150 <%= message.description ? 'border-red-500' : '' %>" cols="30" rows="5" placeholder="Product Description"><%- inputOldValues.description %></textarea>
+                        <div class="mt-1 text-red-500 text-sm font-medium">
+                            <%- message.description %>
+                        </div>
+                    </div>
+                    <button type="submit" class="flex space-x-1 items-center py-3 px-5 bg-gradient-to-r from-indigo-500 to-indigo-700 rounded hover:from-indigo-600 hover:to-indigo-800 transition ease-out duration-150 focus:outline-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 lg:h-6 lg:w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                          </svg>
+                        <span class="block text-gray-100 text-sm md:text-base font-medium">Create</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../layouts/footer') %>
