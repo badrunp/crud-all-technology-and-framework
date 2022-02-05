@@ -1,0 +1,33 @@
+{{ template "layout" .}}
+
+{{ define "main" }}
+<div>
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th>Descriptio</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{ range $data := . }}
+            <tr>
+                <td>{{ $data.Id }}</td>
+                <td>{{ $data.Name }}</td>
+                <td>Rp. {{ $data.Price }}</td>
+                <td>{{ $data.Stock }}</td>
+                <td>{{ $data.Description }}</td>
+                <td>
+                    <a href="/delete/{{ $data.Id }}" onclick="return confirm('Are you Sure?')">Delete</a>
+                    <a href="/edit/{{ $data.Id }}">Edit</a>
+                </td>
+            </tr>
+            {{ end }}
+        </tbody>
+    </table>
+</div>
+{{ end }}
