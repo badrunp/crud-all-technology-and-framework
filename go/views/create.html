@@ -2,4 +2,23 @@
 
 {{ define "main" }}
 <h2>Create Product</h2>
+<form action="/create" method="POST">
+  <div>
+    <label>Produk Name</label>
+    <input type="text" placeholder="Enter Product Name" name="name"/>
+  </div>
+  <div>
+    <label>Product Price</label>
+    <input type="text" placeholder="Enter Product Price" name="price"/>
+  </div>
+  <div>
+    <label>Product Stock</label>
+    <input type="text" placeholder="Enter Product Stock" name="stock"/>
+  </div>
+  <div>
+    <label>Product Description</label/>
+    <input type="text" placeholder="Enter Product Description" name="description"/>
+  </div>
+  <button type="submit">Save Product</button>
+</form>
 {{ end }}

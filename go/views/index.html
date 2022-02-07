@@ -5,7 +5,6 @@
     <table>
         <thead>
             <tr>
-                <th>Id</th>
                 <th>Name</th>
                 <th>Price</th>
                 <th>Stock</th>
@@ -14,15 +13,15 @@
             </tr>
         </thead>
         <tbody>
+            <a href="/create">Tambah Product</a>
             {{ range $data := . }}
             <tr>
-                <td>{{ $data.Id }}</td>
                 <td>{{ $data.Name }}</td>
                 <td>Rp. {{ $data.Price }}</td>
                 <td>{{ $data.Stock }}</td>
                 <td>{{ $data.Description }}</td>
                 <td>
-                    <a href="/delete/{{ $data.Id }}" onclick="return confirm('Are you Sure?')">Delete</a>
+                    <a href="/delete?id={{ $data.Id }}" onclick="return confirm('Are you Sure?')">Delete</a>
                     <a href="/edit/{{ $data.Id }}">Edit</a>
                 </td>
             </tr>

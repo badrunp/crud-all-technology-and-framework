@@ -9,6 +9,7 @@ import (
 func main(){
 	http.HandleFunc("/", controller.IndexProductHandler)
 	http.HandleFunc("/create", controller.CreateProductHandler)
+  http.HandleFunc("/delete", controller.DeleteProductHandler)
 
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("assets"))))
 
